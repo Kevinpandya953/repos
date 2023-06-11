@@ -1,0 +1,98 @@
+﻿@page "/"
+<SfGrid @ref="@DataGrid" TValue="categories" ID="Grid1" AllowPaging="true" AllowFiltering="true" AllowReordering="true" AllowResizing="true" AllowGrouping="true" AllowPdfExport="true" AllowSelection="true" AllowSorting="true" Toolbar="@(new List<string>() {"Add", "Edit", "Delete", "Cancel", "Update","PdfExport"})">
+    <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="Syncfusion.Blazor.Grids.EditMode.Dialog"></GridEditSettings>
+    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar"></GridFilterSettings>
+    <GridPageSettings PageSizes="true"></GridPageSettings>
+    <SfDataManager AdaptorInstance="@typeof(GridCustomAdaptor)" Adaptor="Adaptors.CustomAdaptor"></SfDataManager>
+    <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Multiple"></GridSelectionSettings>
+    <GridEvents OnToolbarClick="@GridToolbarClick" TValue="categories"></GridEvents>
+    <GridColumns>
+      <GridColumn Type="ColumnType.CheckBox" Width="50"></GridColumn>
+    	<GridColumn Field=@nameof(categories.category_id) HeaderText="category_id" IsPrimaryKey="true" Width="150"></GridColumn>
+        <GridColumn Field=@nameof(categories.category_name) HeaderText="category_name"  Width="150"></GridColumn>
+        <GridColumn Field=@nameof(categories.products) HeaderText="products"  Width="150"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@code {  
+    SfGrid<categories> DataGrid { get; set; }
+    /// <summary>
+    /// Event for Toolbar click for Grid Exporting
+    /// </summary>
+    public void GridToolbarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+    	if (args.Item.Id == "Grid1_pdfexport")
+        {
+            this.DataGrid.ExportToPdfAsync();
+        }
+    }
+    public class GridCustomAdaptor : DataAdaptor
+    {
+    	BikeStoresContext SfGridDataContext= new BikeStoresContext();
+    	/// <summary>
+    	/// Method for read data from database
+    	/// </summary>
+    	public override object Read(DataManagerRequest dm, string key = null)
+    	{
+    		IEnumerable<categories> DataSource = SfGridDataContext.categories.ToList();
+    		if (dm.Search != null && dm.Search.Count > 0)
+    		{
+    		  // Searching
+    		  DataSource = DataOperations.PerformSearching(DataSource, dm.Search);
+    		}
+    		if (dm.Sorted != null && dm.Sorted.Count > 0)
+    		{
+    			// Sorting
+    			DataSource = DataOperations.PerformSorting(DataSource, dm.Sorted);
+    		}
+    		if (dm.Where != null && dm.Where.Count > 0)
+    		{
+    			// Filtering
+    			DataSource = DataOperations.PerformFiltering(DataSource, dm.Where, dm.Where[0].Operator);
+    		}
+    		int count = DataSource.Cast<categories>().Count();
+    		if (dm.Skip != 0)
+    		{
+    			//Paging
+    			DataSource = DataOperations.PerformSkip(DataSource, dm.Skip);
+    		}
+    		if (dm.Take != 0)
+    		{
+    			DataSource = DataOperations.PerformTake(DataSource, dm.Take);
+    		}
+    		return dm.RequiresCounts ? new DataResult() { Result = DataSource, Count = count } : (object)DataSource;
+    	}
+    	/// <summary>
+    	/// Method for insert data to database
+    	/// </summary>
+    	public override object Insert(DataManager dataManager, object value, string key)
+    	{
+    		SfGridDataContext.categories.Add(value as categories);
+    		SfGridDataContext.SaveChanges();
+    		return value;
+    	}
+    	/// <summary>
+    	/// Method for update data to database
+    	/// </summary>
+    	public override object Update(DataManager dataManager, object value, string keyField, string key)
+    	{
+    		var ModelValue = (value as categories);
+            var data = SfGridDataContext.categories.Where(x => x.category_id == ModelValue.category_id).SingleOrDefault();
+    		data.category_id = ModelValue.category_id;
+            data.category_name = ModelValue.category_name;
+            data.products = ModelValue.products;
+            SfGridDataContext.SaveChanges();
+    		return value;
+    	}
+    	/// <summary>
+    	/// Method for remove data from database
+    	/// </summary>
+    	public override object Remove(DataManager dataManager, object value, string keyField, string key)
+    	{
+            categories ord = SfGridDataContext.categories.Find((int)value);
+    		SfGridDataContext.categories.Remove(ord);
+    		SfGridDataContext.SaveChanges();
+    		return value;
+    	}
+    }
+}

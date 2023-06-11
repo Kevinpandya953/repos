@@ -1,0 +1,40 @@
+﻿@page "/Products"
+@using Blazorwebapplication.Models;
+@using Syncfusion.Blazor.Data;
+@using Syncfusion.Blazor;
+@using System.Collections;
+@using Syncfusion.Blazor.Grids;
+@using Blazorwebapplication.Data
+@inject ProductsService data;
+
+<SfGrid @ref="@Grid" TValue="Product" ID="Grid" DataSource="GridData" AllowResizing="true" Toolbar="@(new List<string>() { "Search"})" Height="315">
+ 
+  <GridColumns>
+	<GridColumn Field="ProductId"  HeaderText="ProductId" Type="ColumnType.Number"></GridColumn>
+	<GridColumn Field="ProductName"  HeaderText="ProductName" Type="ColumnType.String"></GridColumn>
+	<GridColumn Field="BrandId"  HeaderText="BrandId" Type="ColumnType.Number"></GridColumn>
+	<GridColumn Field="CategoryId"  HeaderText="CategoryId" Type="ColumnType.Number"></GridColumn>
+	<GridColumn Field="ModelYear"  HeaderText="ModelYear"></GridColumn>
+	<GridColumn Field="ListPrice"  HeaderText="ListPrice" Type="ColumnType.Number"></GridColumn>
+	<GridColumn Field="Brand"  HeaderText="Brand"></GridColumn>
+	<GridColumn Field="Category"  HeaderText="Category"></GridColumn>
+	<GridColumn Field="Stocks"  HeaderText="Stocks"></GridColumn>
+  </GridColumns>
+</SfGrid>
+
+@code{
+ 	 public  List<Product> GridData { get; set; }
+      protected override void OnInitialized()
+      {
+        GridData = data.GetAllProduct().ToList();
+      }
+
+			
+	SfGrid<Product> Grid;
+
+    
+}
+ 
+
+
+

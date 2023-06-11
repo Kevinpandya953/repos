@@ -1,0 +1,46 @@
+﻿@page "/Brands"
+@using BikeStoresapp1.Models;
+@using Syncfusion.Blazor.Data;
+@using Syncfusion.Blazor;
+@using System.Collections;
+@using Syncfusion.Blazor.Grids;
+@using BikeStoresapp1.Data;
+
+@inject BrandsService Data
+
+<SfGrid @ref="@Grid" TValue="brands" ID="Grid" DataSource="GridData" AllowResizing="true" AllowSorting="true" AllowPaging="true"  AllowExcelExport="true" Toolbar="@(new List<string>() { "ExcelExport" ,"PdfExport"})" AllowPdfExport="true" Height="315">
+ <GridPageSettings PageSize="7"></GridPageSettings>
+<GridEvents OnToolbarClick="ToolbarClick" TValue="brands"></GridEvents>
+  <GridColumns>
+	<GridColumn Field="brand_id"  HeaderText="brand_id" Type="ColumnType.Number"></GridColumn>
+	<GridColumn Field="brand_name"  HeaderText="brand_name" Type="ColumnType.String"></GridColumn>
+	<GridColumn Field="products"  HeaderText="products"></GridColumn>
+  </GridColumns>
+</SfGrid>
+
+@code{
+ 	 public  List<brands> GridData { get; set; }
+      protected override void OnInitialized()
+      {
+        GridData = Data.GetAllbrands().ToList();
+      }
+
+			
+	SfGrid<brands> Grid;
+
+    public void ToolbarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+{
+  if (args.Item.Id == "Grid_pdfexport")
+  {
+    this.Grid.ExportToPdfAsync();
+  }
+    if (args.Item.Id == "Grid_excelexport")
+  {
+    this.Grid.ExportToExcelAsync();
+  }
+}
+}
+ 
+
+
+

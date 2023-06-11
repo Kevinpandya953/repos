@@ -1,0 +1,34 @@
+﻿@page "/Brands"
+@using Testapp.Models;
+@using Syncfusion.Blazor.Data;
+@using Syncfusion.Blazor;
+@using System.Collections;
+@using Syncfusion.Blazor.Grids;
+@using Testapp.Data
+@inject BrandsService data;
+
+<SfGrid @ref="@Grid" TValue="ProductionBrands" ID="Grid" DataSource="GridData" AllowResizing="true" Toolbar="@(new List<string>() { "Search"})" AllowFiltering="true" Height="315">
+ <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Menu"></GridFilterSettings>
+  <GridColumns>
+	<GridColumn Field="BrandId"  HeaderText="BrandId" Type="ColumnType.Number"></GridColumn>
+	<GridColumn Field="BrandName"  HeaderText="BrandName" Type="ColumnType.String"></GridColumn>
+	<GridColumn Field="ProductionProducts"  HeaderText="ProductionProducts"></GridColumn>
+  </GridColumns>
+</SfGrid>
+
+@code{
+ 	 public  List<ProductionBrands> GridData { get; set; }
+      protected override void OnInitialized()
+      {
+        GridData = data.GetAllProductionBrands().ToList();
+      }
+
+			
+	SfGrid<ProductionBrands> Grid;
+
+    
+}
+ 
+
+
+
